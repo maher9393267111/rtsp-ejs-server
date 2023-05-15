@@ -1,11 +1,11 @@
 const express = require('express');
 const ejs     = require('ejs');
-//const RtmpServer = require('rtmp-server');
+const RtmpServer = require('rtmp-server');
 const ffmpeg = require('fluent-ffmpeg');
-const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-const PORT = process.env.PORT || 8000;
-
 const HLSServer = require('hls-server');
+const findRemoveSync = require('find-remove')
+
+ const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg')
 
 const server = express();
 
@@ -14,9 +14,7 @@ const hls = new HLSServer(server, {
   dir: 'streams'
 });
 
-
-
-//const rtmpServer = new RtmpServer();
+const rtmpServer = new RtmpServer();
 
 server.set('view engine', 'ejs');
 server.use('/live', express.static(__dirname + '/streams'));
@@ -27,13 +25,125 @@ server.get('/', (req, res) => {
 
 server.get('*', (req,res) => {
   console.log("GET /*");
-  res.render('hello');
 });
 
-//var ffmpegStream = new ffmpeg({ source: 'rtsp://185.217.90.19:554/11', nolog: true, timeout: 432000 });
+var ffmpegStream = new ffmpeg({ source: 'rtsp://185.217.90.19:554/11', nolog: true, timeout: 432000 });
 
-//ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+
 //ffmpegStream.setFfmpegPath("C:\\Program Files\\FFMPEG\\bin\\ffmpeg.exe");
+ffmpegStream.addOptions([
+    '-c:v libx264',
+    '-c:a aac',
+    '-ac 1',
+    '-strict -2',
+    '-crf 18',
+    '-profile:v baseline',
+    '-maxrate 400k',
+    '-bufsize 1835k',
+    '-pix_fmt yuv420p',
+    '-hls_time 10',
+    '-hls_list_size 6',
+    '-hls_wrap 10',
+    '-start_number 1'
+  ]).output('streams/output.m3u8').on('end', () => { console.log("End"); }).run(
+
+
+     (function() {
+
+      setInterval(() => {
+         var result = findRemoveSync('./streams', { age: { seconds: 30 }, extensions: '.ts' });
+         console.log(result);
+    }, 5000);
+  
+    console.log('removeed Files')
+  
+   })()
+  
+
+
+  );
+
+rtmpServer.on('client', client => { 
+  client.on('connect', () => {
+     console.log('connect', client.app);
+  });
+  
+  client.on('play', ({ streamName }) => {
+    console.log('PLAY', streamName);
+  });
+  
+  client.on('publish', ({ streamName }) => {
+    console.log('PUBLISH', streamName);
+  });
+  
+  client.on('stop', () => {
+    console.log('client disconnected');
+  });
+});
+
+rtmpServer.on('error', err => {
+  throw err;
+});
+
+rtmpServer.listen(1935, () => { console.log("RTMP Server Listen: localhost:1935"); });
+server.listen(8000, () => { console.log("HTTP/HLS Server Listen: localhost:8000"); });
+
+
+
+
+
+
+// -----------------------
+
+
+
+
+
+// const express = require('express');
+// const ejs     = require('ejs');
+// const findRemoveSync = require('find-remove')
+// const RtmpServer = require('rtmp-server');
+// const ffmpeg = require('fluent-ffmpeg');
+// const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+// const PORT = process.env.PORT || 8000;
+
+// const HLSServer = require('hls-server');
+
+// const server = express();
+
+// const hls = new HLSServer(server, {
+//   path: '/live',
+//   dir: 'streams'
+// });
+
+
+
+// const rtmpServer = new RtmpServer();
+
+// server.set('view engine', 'ejs');
+// server.use('/live', express.static(__dirname + '/streams'));
+
+// server.get('/', (req, res) => {
+//   res.render('index');
+// });
+
+// server.get('*', (req,res) => {
+//   console.log("GET /*");
+//   //res.('hello');
+// });
+
+
+// // ---------
+// //first Step execute command
+// //ffmpeg.exe -i rtsp://185.217.90.19:554/11  -fflags flush_packets -max_delay 5 -flags -global_header -hls_time 5 -hls_list_size 3 -vcodec copy -y .\streams\output.m3u8
+
+// // ----second Step----
+// var ffmpegStream = new ffmpeg({ source: 'rtsp://185.217.90.19:554/11', nolog: true, timeout: 432000 });
+
+// ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+// //ffmpegStream.setFfmpegPath("C:\\Program Files\\FFMPEG\\bin\\ffmpeg.exe");
 
 
 
@@ -51,7 +161,31 @@ server.get('*', (req,res) => {
 
 
 
-//   ]).output('streams/output.m3u8').on('end', () => { console.log("End"); }).run();
+//   ]).output('streams/output.m3u8').on('end', () => { console.log("End"); }).run(
+
+//   //   (function() {
+
+//   //     setInterval(() => {
+//   //       var result = findRemoveSync('./streams', { age: { seconds: 30 }, extensions: '.ts' });
+//   //       console.log(result);
+//   //   }, 50000);
+  
+//   //   console.log('removeed Files')
+  
+//   // })()
+  
+
+
+//   );
+
+
+
+
+
+
+
+
+
 
 
 
@@ -61,23 +195,24 @@ server.get('*', (req,res) => {
 //   client.on('connect', () => {
 //      console.log('connect', client.app);
 //   });
+// })
   
-//   client.on('play', ({ streamName }) => {
-//     console.log('PLAY', streamName);
-//   });
+// //   client.on('play', ({ streamName }) => {
+// //     console.log('PLAY', streamName);
+// //   });
   
-//   client.on('publish', ({ streamName }) => {
-//     console.log('PUBLISH', streamName);
-//   });
+// //   client.on('publish', ({ streamName }) => {
+// //     console.log('PUBLISH', streamName);
+// //   });
   
-//   client.on('stop', () => {
-//     console.log('client disconnected');
-//   });
-// });
+// //   client.on('stop', () => {
+// //     console.log('client disconnected');
+// //   });
+// // });
 
-// rtmpServer.on('error', err => {
-//   throw err;
-// });
+// // rtmpServer.on('error', err => {
+// //   throw err;
+// // });
 
-//rtmpServer.listen(1935, () => { console.log("RTMP Server Listen: localhost:1935"); });
-server.listen(PORT, () => { console.log("HTTP/HLS Server Listen: localhost:8000"); });
+// rtmpServer.listen(1935, () => { console.log("RTMP Server Listen: localhost:1935"); });
+// server.listen(PORT, () => { console.log("HTTP/HLS Server Listen: localhost:8000"); });
