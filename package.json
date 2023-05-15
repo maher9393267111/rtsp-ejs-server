@@ -1,0 +1,34 @@
+{
+  "name": "JavaScript RTMP/HLS Server",
+  "version": "1.0.0",
+  "description": "Transmisión en vivo de video con nodejs y open broascaster - RTMP/HLS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carlosmart7104/JavaScript-Video-Live-Stream-Server-RTMP-HLS.git"
+  },
+  "keywords": [
+    "NodeJS",
+    "Express",
+    "RTMP",
+    "HLS",
+    "Video",
+    "Live",
+    "Streaming",
+    "Server"
+  ],
+  "author": "carlosmart7104",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "hls-server": "^1.5.0",
+    "http-attach": "^1.0.0",
+    "rtmp-server": "^0.2.0"
+  }
+}
