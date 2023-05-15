@@ -10,11 +10,12 @@
 <video id="video" controls="true" width="640"></video>
 <script>
   if(Hls.isSupported()) {
+    console.log('host-->' ,location.host)
     var video = document.getElementById('video');
     var hls = new Hls();
-    hls.loadSource('https://rtsp-ejs-server.vercel.app/live/output.m3u8')
-    // (
-    //   'http://'+location.host+'/live/output.m3u8');
+    hls.loadSource('/live/output.m3u8')
+   // ('https://rtsp-ejs-server.vercel.app/live/output.m3u8')
+  //   ('http://'+location.host+'/live/output.m3u8');
     hls.attachMedia(video);
     hls.on(Hls.Events.MANIFEST_PARSED,function() {
       video.play();
