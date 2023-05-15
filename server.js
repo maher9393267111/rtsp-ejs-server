@@ -27,39 +27,35 @@ server.get('/', (req, res) => {
 
 server.get('*', (req,res) => {
   console.log("GET /*");
+  res.render('hello');
 });
 
-var ffmpegStream = new ffmpeg({ source: 'rtsp://185.217.90.19:554/11', nolog: true, timeout: 432000 });
+//var ffmpegStream = new ffmpeg({ source: 'rtsp://185.217.90.19:554/11', nolog: true, timeout: 432000 });
 
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+//ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 //ffmpegStream.setFfmpegPath("C:\\Program Files\\FFMPEG\\bin\\ffmpeg.exe");
-ffmpegStream.addOptions([
-    // '-c:v libx264',
-    // '-c:a aac',
-    // '-ac 1',
-    // '-strict -2',
-    // '-crf 18',
-    // '-profile:v baseline',
-    // '-maxrate 400k',
-    // '-bufsize 1835k',
-    // '-pix_fmt yuv420p',
-    // '-hls_time 10',
-    // '-hls_list_size 6',
-    // '-hls_wrap 10',
-    // '-start_number 1'
+
+
+
+// ffmpegStream.addOptions([
+  
 
     
 
-    '-profile:v baseline',
-    '-level 3.0',
-    '-start_number 0',
-    '-hls_time 10',
-    '-hls_list_size 0',
-    '-f hls'
+//     '-profile:v baseline',
+//     '-level 3.0',
+//     '-start_number 0',
+//     '-hls_time 10',
+//     '-hls_list_size 0',
+//     '-f hls'
 
 
 
-  ]).output('streams/output.m3u8').on('end', () => { console.log("End"); }).run();
+//   ]).output('streams/output.m3u8').on('end', () => { console.log("End"); }).run();
+
+
+
+
 
 // rtmpServer.on('client', client => { 
 //   client.on('connect', () => {
