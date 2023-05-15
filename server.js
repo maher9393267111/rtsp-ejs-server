@@ -9,19 +9,28 @@ const findRemoveSync = require('find-remove')
 
 const server = express();
 
-const hls = new HLSServer(server, {
-  path: '/live',
-  dir: 'streams'
-});
+// const hls = new HLSServer(server, {
+//   path: '/live',
+//   dir: 'streams'
+// });
 
 const rtmpServer = new RtmpServer();
 
 server.set('view engine', 'ejs');
-server.use('/live', express.static(__dirname + '/streams'));
+server.use('/live', express.static(__dirname + '/streams')); // in index.ejs -->  hls.loadSource('https://'+location.host+'/live/output.m3u8');
 
 server.get('/', (req, res) => {
+  res.status(200).json('start server')
+  //res.render('index');
+});
+
+server.get('/stream', (req, res) => {
+  console.log('stream Page')
+  
   res.render('index');
 });
+
+
 
 server.get('*', (req,res) => {
   console.log("GET /*");
@@ -55,7 +64,7 @@ ffmpegStream.addOptions([
       setInterval(() => {
          var result = findRemoveSync('./streams', { age: { seconds: 30 }, extensions: '.ts' });
          console.log(result);
-    }, 5000);
+    }, 50);
   
     console.log('removeed Files')
   
@@ -65,29 +74,13 @@ ffmpegStream.addOptions([
 
   );
 
-rtmpServer.on('client', client => { 
-  client.on('connect', () => {
-     console.log('connect', client.app);
-  });
-  
-  client.on('play', ({ streamName }) => {
-    console.log('PLAY', streamName);
-  });
-  
-  client.on('publish', ({ streamName }) => {
-    console.log('PUBLISH', streamName);
-  });
-  
-  client.on('stop', () => {
-    console.log('client disconnected');
-  });
-});
 
-rtmpServer.on('error', err => {
-  throw err;
-});
 
-rtmpServer.listen(1935, () => { console.log("RTMP Server Listen: localhost:1935"); });
+
+
+
+
+
 server.listen(8000, () => { console.log("HTTP/HLS Server Listen: localhost:8000"); });
 
 
