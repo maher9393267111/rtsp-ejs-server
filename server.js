@@ -1,9 +1,9 @@
 const express = require('express');
 const ejs     = require('ejs');
-const RtmpServer = require('rtmp-server');
+//const RtmpServer = require('rtmp-server');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-
+const PORT = process.env.PORT || 8000;
 
 const HLSServer = require('hls-server');
 
@@ -16,7 +16,7 @@ const hls = new HLSServer(server, {
 
 
 
-const rtmpServer = new RtmpServer();
+//const rtmpServer = new RtmpServer();
 
 server.set('view engine', 'ejs');
 server.use('/live', express.static(__dirname + '/streams'));
@@ -61,27 +61,27 @@ ffmpegStream.addOptions([
 
   ]).output('streams/output.m3u8').on('end', () => { console.log("End"); }).run();
 
-rtmpServer.on('client', client => { 
-  client.on('connect', () => {
-     console.log('connect', client.app);
-  });
+// rtmpServer.on('client', client => { 
+//   client.on('connect', () => {
+//      console.log('connect', client.app);
+//   });
   
-  client.on('play', ({ streamName }) => {
-    console.log('PLAY', streamName);
-  });
+//   client.on('play', ({ streamName }) => {
+//     console.log('PLAY', streamName);
+//   });
   
-  client.on('publish', ({ streamName }) => {
-    console.log('PUBLISH', streamName);
-  });
+//   client.on('publish', ({ streamName }) => {
+//     console.log('PUBLISH', streamName);
+//   });
   
-  client.on('stop', () => {
-    console.log('client disconnected');
-  });
-});
+//   client.on('stop', () => {
+//     console.log('client disconnected');
+//   });
+// });
 
-rtmpServer.on('error', err => {
-  throw err;
-});
+// rtmpServer.on('error', err => {
+//   throw err;
+// });
 
-rtmpServer.listen(1935, () => { console.log("RTMP Server Listen: localhost:1935"); });
-server.listen(8000, () => { console.log("HTTP/HLS Server Listen: localhost:8000"); });
+//rtmpServer.listen(1935, () => { console.log("RTMP Server Listen: localhost:1935"); });
+server.listen(PORT, () => { console.log("HTTP/HLS Server Listen: localhost:8000"); });
